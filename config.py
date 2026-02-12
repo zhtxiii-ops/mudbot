@@ -1,0 +1,45 @@
+"""
+Task6 配置模块
+从 apikey.txt 读取 API Key，支持环境变量覆盖。
+"""
+import os
+
+# --- 读取 API Key ---
+_SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+_APIKEY_FILE = os.path.join(_SCRIPT_DIR, "apikey.txt")
+
+def _load_api_key():
+    """从 apikey.txt 读取 API Key"""
+    try:
+        with open(_APIKEY_FILE, "r", encoding="utf-8") as f:
+            return f.read().strip()
+    except FileNotFoundError:
+        return ""
+
+# --- Socket 连接配置 ---
+TARGET_IP = os.environ.get("AGENT_TARGET_IP", "127.0.0.1")
+TARGET_PORT = int(os.environ.get("AGENT_TARGET_PORT", 4000))
+
+# --- 智能体运行配置 ---
+MAX_HISTORY_ROUNDS = 50
+LOG_FILE = os.path.join(_SCRIPT_DIR, "agent_interaction.log")
+KB_FILE = os.path.join(_SCRIPT_DIR, "knowledge_base.json")  # 保留兼容
+KB_DIR = os.path.join(_SCRIPT_DIR, "knowledge_bases")  # 阶段化知识库目录
+KB_CONSOLIDATION_INTERVAL = 10  # 每隔 N 轮整理一次知识库
+
+# --- LLM 配置 ---
+API_KEY = os.environ.get("DEEPSEEK_API_KEY", _load_api_key())
+BASE_URL = os.environ.get("DEEPSEEK_BASE_URL", "https://api.deepseek.com")
+MODEL = os.environ.get("DEEPSEEK_MODEL", "deepseek-chat")
+REASONER_MODEL = os.environ.get("DEEPSEEK_REASONER_MODEL", "deepseek-reasoner")
+
+# --- 颜色配置 ---
+class Colors:
+    RESET = "\033[0m"
+    RED = "\033[91m"
+    GREEN = "\033[92m"   # Client
+    YELLOW = "\033[93m"  # Short-term Goal
+    BLUE = "\033[94m"    # Long-term Goal
+    MAGENTA = "\033[95m" # KB Update
+    CYAN = "\033[96m"    # Analysis
+    WHITE = "\033[97m"

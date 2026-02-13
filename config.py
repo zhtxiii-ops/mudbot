@@ -25,7 +25,8 @@ MAX_HISTORY_ROUNDS = 50
 LOG_FILE = os.path.join(_SCRIPT_DIR, "agent_interaction.log")
 KB_FILE = os.path.join(_SCRIPT_DIR, "knowledge_base.json")  # 保留兼容
 KB_DIR = os.path.join(_SCRIPT_DIR, "knowledge_bases")  # 阶段化知识库目录
-KB_CONSOLIDATION_INTERVAL = 10  # 每隔 N 轮整理一次知识库
+KB_CONSOLIDATION_INTERVAL = 20  # 每隔 N 轮整理一次知识库
+MAX_TASK_ATTEMPTS = 50           # 单个任务最大尝试轮数，超过则判定为僵局
 
 # --- LLM 配置 ---
 API_KEY = os.environ.get("DEEPSEEK_API_KEY", _load_api_key())

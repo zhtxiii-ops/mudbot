@@ -123,7 +123,8 @@ def observe(state: AgentState) -> dict:
             "should_reconnect": True,
         }
 
-    log_colored("服务器", server_output)
+    if server_output and server_output.strip():
+        log_colored("服务器", server_output)
 
     server_output_clean = client.clean_ansi(server_output)
     # Filter out specific compiler warnings
@@ -161,6 +162,7 @@ def analyze(state: AgentState) -> dict:
     phase = state.get("phase", 1)
     phase_name = state.get("phase_name", "未知")
     environment_type = state.get("environment_type", "unknown")
+    task_attempts = state.get("task_attempts", 0) + 1  # 递增尝试计数
 
     # 构建知识库字符串（使用聚合后的全量知识）
     full_kb = get_aggregated_kb(phase, knowledge_base)
@@ -193,24 +195,28 @@ def analyze(state: AgentState) -> dict:
 当前知识库:
 {kb_str}
 
-交互历史 (Client -> Server):
+交互历史 (Client -> Server)，也就是你最近和服务器的对话过程记录:
 {history_str}
 
 服务器的最后输出是："{server_output_clean}"
 
+当前任务已尝试 {task_attempts} 轮（上限 {config.MAX_TASK_ATTEMPTS} 轮）。
+
 你的任务：
 1. 分析服务器的响应，判断它与当前任务的关系。注意有些输出并非输入的直接响应，可能是服务器的自然输出或者是之前输入的延迟响应，需要仔细辨别。
-2. 根据执行计划，决定下一步应该发送什么命令。当陷入困境时，查看帮助系统。
+2. 根据当前阶段的任务和计划，交互历史和服务器最后输出，利用你掌握的当前知识库的知识，决定下一步应该发送什么命令,预期什么结果。当交互历史显示连续多次预期都不对时，适时调整命令，可以参考帮助系统。
 3. 判断当前任务是否已经完成（有足够信息得出结论）。
-4. 如果任务涉及环境识别，给出环境类型。
+4. 如果你发现经过多轮尝试后任务无法完成或只能部分完成（例如反复尝试同样的命令、陷入循环、或者环境不支持所需操作），请如实汇报，设置 task_stuck 为 true。
 
 严格以 JSON 格式输出：
 {{
-    "analysis": "你的详细分析...",
+    "analysis": "你的简要分析...",
     "next_payload": "下一步要发送的具体字符串",
+    "expected_result": "简要给出你预期服务器的大致输出结果",
     "task_completed": true/false,
     "task_result": "如果任务完成，简要总结结果；否则为空",
-    "environment_type": "如果识别了环境类型填写(mud/shell/chat/llm_qa/bbs/other/non_text)，否则填 null"
+    "task_stuck": true/false,
+    "task_stuck_reason": "如果陷入僵局，说明原因和已取得的部分成果；否则为空"
 }}
 """
 
@@ -233,13 +239,17 @@ def analyze(state: AgentState) -> dict:
     task_done = decision.get("task_completed", False)
     task_result = decision.get("task_result", "")
     env_type = decision.get("environment_type")
+    llm_stuck = decision.get("task_stuck", False)
+    llm_stuck_reason = decision.get("task_stuck_reason", "")
 
-    log_colored("分析", f"[{task_id}] {analysis}", Colors.CYAN)
+    log_colored("分析", f"[{task_id}] (尝试 {task_attempts}/{config.MAX_TASK_ATTEMPTS}) {analysis}", Colors.CYAN)
 
     result = {
         "analysis": analysis,
         "payload": payload,
         "task_completed": False,  # 默认不完成
+        "task_stuck": False,      # 默认不僵局
+        "task_attempts": task_attempts,
     }
 
     # 处理环境类型识别
@@ -262,9 +272,31 @@ def analyze(state: AgentState) -> dict:
         result["task_completed"] = True
         result["tasks"] = tasks
         result["current_task"] = current_task_updated
-    else:
-        log_colored("分析", f"任务 [{task_id}] 继续执行中...", Colors.YELLOW)
+        result["task_attempts"] = 0  # 任务完成，重置计数
+        return result
 
+    # 处理任务僵局：LLM 主动判定 或 超过最大尝试次数
+    task_is_stuck = llm_stuck or (task_attempts >= config.MAX_TASK_ATTEMPTS)
+    if task_is_stuck:
+        stuck_reason = llm_stuck_reason or f"任务已尝试 {task_attempts} 轮仍未完成，超过阈值 {config.MAX_TASK_ATTEMPTS}"
+        log_colored("分析", f"任务 [{task_id}] 陷入僵局: {stuck_reason}", Colors.RED)
+        # 更新任务列表中的状态
+        for t in tasks:
+            if t["id"] == current_task.get("id"):
+                t["status"] = "stuck"
+                t["result"] = stuck_reason
+                break
+        current_task_updated = dict(current_task)
+        current_task_updated["status"] = "stuck"
+        current_task_updated["result"] = stuck_reason
+        result["task_stuck"] = True
+        result["task_stuck_reason"] = stuck_reason
+        result["tasks"] = tasks
+        result["current_task"] = current_task_updated
+        result["task_attempts"] = 0  # 僵局后重置计数
+        return result
+
+    log_colored("分析", f"任务 [{task_id}] 继续执行中...", Colors.YELLOW)
     return result
 
 

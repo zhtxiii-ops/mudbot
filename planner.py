@@ -84,9 +84,46 @@ def planner(state: AgentState) -> dict:
             _log("规划者", f"第{phase}阶段任务已生成（{len(tasks)}个任务）", Colors.BLUE)
 
     # ------------------------------------------------------------------
+    # 步骤1.5：处理 stuck 任务 (优先于阶段完成检查)
+    # ------------------------------------------------------------------
+    if state.get("task_stuck", False):
+        stuck_reason = state.get("task_stuck_reason", "未知原因")
+        current_task = state.get("current_task", {})
+        task_id = current_task.get("id", "?")
+
+        _log("规划者", f"处理僵局任务 [{task_id}]: {stuck_reason}", Colors.RED)
+
+        # 获取全量知识用于决策
+        full_kb = get_aggregated_kb(phase, knowledge_base)
+        
+        # LLM 决策如何处理
+        action_updates = _handle_stuck_task(llm, current_task, stuck_reason, full_kb, phase)
+        
+        # 更新任务列表
+        for t in tasks:
+            if t["id"] == task_id:
+                t.update(action_updates)
+                _log("规划者", f"任务 [{task_id}] 更新状态为: {t['status']}", Colors.YELLOW)
+                if t["status"] == "in_progress":
+                     # 如果是重试，需要更新 current_task 以便后续生成新计划（或者由下文的分配逻辑处理）
+                     # 这里将 status 设为 pending 让下文逻辑重新分配更稳妥？
+                     # 不，_handle_stuck_task 返回的 status 可能是 'pending' (重试)
+                     pass
+                break
+        
+        # 清除 stuck 状态
+        return {
+            "tasks": tasks,
+            "current_task": {},  # 清空当前任务，让规划者重新分配
+            "task_stuck": False,
+            "task_stuck_reason": "",
+            "task_attempts": 0,
+        }
+
+    # ------------------------------------------------------------------
     # 步骤2：检查是否所有任务完成 → 推进阶段
     # ------------------------------------------------------------------
-    all_done = all(t["status"] == "completed" for t in tasks)
+    all_done = all(t["status"] in ("completed", "skipped") for t in tasks)
     if all_done and tasks:
         _log("规划者", f"阶段 {phase} 所有任务已完成，准备推进到下一阶段。", Colors.BLUE)
 
@@ -143,12 +180,23 @@ def planner(state: AgentState) -> dict:
 
     # ------------------------------------------------------------------
     # 步骤3：选取下一个待执行任务，制定执行计划
+    # 优先处理因中断而卡在 in_progress 的任务，其次是 pending 的新任务
     # ------------------------------------------------------------------
     next_task = None
+
+    # 优先：查找因连接中断而卡在 in_progress 的任务（需要重新执行）
     for t in tasks:
-        if t["status"] == "pending":
+        if t["status"] == "in_progress":
             next_task = t
+            _log("规划者", f"发现被中断的任务 [{t['id']}]，重新分配。", Colors.YELLOW)
             break
+
+    # 其次：查找下一个 pending 任务
+    if next_task is None:
+        for t in tasks:
+            if t["status"] == "pending":
+                next_task = t
+                break
 
     if next_task is None:
         _log("规划者", "没有可执行的任务。", Colors.YELLOW)
@@ -304,3 +352,65 @@ def _format_kb(knowledge_base, limit=30):
         else:
             kb_str += f"- {entry}\n"
     return kb_str
+
+
+def _handle_stuck_task(llm, task, stuck_reason, knowledge_base, phase):
+    """
+    处理陷入僵局的任务。
+    由 LLM 决定：
+    1. skip: 跳过（非关键任务）
+    2. partial: 部分完成（已取得部分成果）
+    3. retry: 修改描述后重试（改变方法）
+    """
+    kb_str = _format_kb(knowledge_base, limit=20)
+    
+    system_prompt = f"""
+你是一个项目经理。当前阶段（{phase}）的一个任务陷入了僵局，分析节点经过多次尝试仍无法完成。
+请根据情况决定如何处理该任务。
+
+任务信息:
+ID: {task.get('id')}
+描述: {task.get('description')}
+原计划: {task.get('plan')}
+
+僵局原因 / 当前状态:
+{stuck_reason}
+
+相关知识库上下文:
+{kb_str}
+
+决策选项:
+1. "skip": 如果该任务对当前阶段目标不是非做不可，或者环境显然不支持，选择跳过。
+2. "completed": 如果虽然报错但核心目标其实已经达成（部分完成），或者僵局原因显示其实已经拿到了想要的信息，标记为完成。
+3. "pending": 如果该任务非常关键，必须完成。你需要修改任务描述（简化或换个角度），将其状态重置为 pending，以便稍后重新尝试。
+
+严格以 JSON 格式输出：
+{{
+    "action": "skip" | "completed" | "pending",
+    "reasoning": "决策理由...",
+    "new_description": "如果选择 pending，请提供修改后的任务描述；否则同原描述",
+    "result_summary": "如果选择 skip 或 completed，请提供任务结果摘要（基于僵局原因）"
+}}
+"""
+    result = llm.call_with_retry(
+        system_prompt, "请决策如何处理僵局任务。",
+        json_mode=True, model=config.REASONER_MODEL
+    )
+    
+    action = result.get("action", "skip")
+    new_desc = result.get("new_description", task.get("description"))
+    res_summary = result.get("result_summary", stuck_reason)
+    
+    updates = {}
+    if action == "skip":
+        updates = {"status": "skipped", "result": f"(跳过) {res_summary}"}
+    elif action == "completed":
+        updates = {"status": "completed", "result": f"(部分完成) {res_summary}"}
+    elif action == "pending":
+        updates = {"status": "pending", "description": new_desc, "result": None}
+    else:
+        # Fallback
+        updates = {"status": "skipped", "result": f"(异常跳过) {stuck_reason}"}
+        
+    return updates
+

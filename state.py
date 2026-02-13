@@ -41,6 +41,9 @@ class AgentState(TypedDict, total=False):
     should_stop: bool        # 需要停止（用户中断）
     should_exit: bool        # 非文本环境，需要退出
     task_completed: bool     # 当前任务已完成（由 analyze 判定，触发返回 planner）
+    task_stuck: bool         # 当前任务陷入僵局（由 analyze 判定，触发返回 planner）
+    task_attempts: int       # 当前任务已执行的循环次数
+    task_stuck_reason: str   # 僵局原因描述（含部分成果）
 
     # --- 知识库管理 ---
     kb_consolidation_counter: int  # 知识库整理计数器

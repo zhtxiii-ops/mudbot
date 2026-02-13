@@ -76,7 +76,7 @@ class SocketClient:
             return data.decode("utf-8", errors="ignore").strip()
 
         except socket.timeout:
-            return "<超时 - 无响应>"
+            return ""
         except (ConnectionResetError, BrokenPipeError) as e:
             print(f"{Colors.RED}[系统] 连接中断：{e}{Colors.RESET}")
             self.disconnect()

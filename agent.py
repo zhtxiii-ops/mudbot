@@ -28,6 +28,29 @@ def main():
     compiled_graph = build_graph()
     log_colored("系统", "LangGraph 状态图已编译", Colors.WHITE)
 
+    # 构建初始状态（只在首次启动时使用，重连时会保留进度）
+    current_state = {
+        "client": client,
+        "llm": llm,
+        "server_output": "",
+        "server_output_clean": "",
+        "history": [],
+        "knowledge_base": load_kb(phase=1),  # 加载阶段1知识库
+        "phase": 1,
+        "phase_name": "环境识别",
+        "tasks": [],
+        "current_task": {},
+        "completed_phases": [],
+        "environment_type": "unknown",
+        "analysis": "",
+        "payload": "",
+        "should_reconnect": False,
+        "should_stop": False,
+        "should_exit": False,
+        "task_completed": False,
+        "kb_consolidation_counter": 0,
+    }
+
     while True:  # 外层重连循环
         try:
             # 尝试连接
@@ -36,32 +59,29 @@ def main():
                 time.sleep(5)
                 continue
 
-            # 构建初始状态（规划者驱动，无长期/短期目标）
-            initial_state = {
-                "client": client,
-                "llm": llm,
-                "server_output": "",
-                "server_output_clean": "",
-                "history": [],
-                "knowledge_base": load_kb(phase=1),  # 加载阶段1知识库
-                "phase": 1,
-                "phase_name": "环境识别",
-                "tasks": [],
-                "current_task": {},
-                "completed_phases": [],
-                "environment_type": "unknown",
-                "analysis": "",
-                "payload": "",
-                "should_reconnect": False,
-                "should_stop": False,
-                "should_exit": False,
-                "task_completed": False,
-                "kb_consolidation_counter": 0,
-            }
+            # 重连时：重置连接/控制流字段，保留任务进度
+            current_state["client"] = client
+            current_state["llm"] = llm
+            current_state["server_output"] = ""
+            current_state["server_output_clean"] = ""
+            current_state["should_reconnect"] = False
+            current_state["should_stop"] = False
+            current_state["should_exit"] = False
+            current_state["payload"] = ""
+            current_state["kb_update_future"] = None
+
+            # 从磁盘重新加载当前阶段知识库（防止断连丢失）
+            current_phase = current_state.get("phase", 1)
+            current_state["knowledge_base"] = load_kb(phase=current_phase)
+
+            log_colored("系统", f"当前进度：阶段 {current_state['phase']} - {current_state['phase_name']}", Colors.WHITE)
 
             # 运行 LangGraph 图
             log_colored("系统", "开始规划者驱动循环...", Colors.WHITE)
-            final_state = compiled_graph.invoke(initial_state)
+            final_state = compiled_graph.invoke(current_state)
+
+            # 图退出后，保留 final_state 作为下次重连的基础
+            current_state = dict(final_state)
 
             # 图退出 → 检查原因
             if final_state.get("should_stop", False):

@@ -50,9 +50,12 @@ def _route_after_sync_kb(state: AgentState) -> str:
     """
     sync_kb 之后的路由：
     - 当前任务已完成 → planner（回到规划者拿下一个任务）
+    - 当前任务陷入僵局 → planner（回到规划者重新决策）
     - 当前任务未完成 → observe（继续执行循环）
     """
     if state.get("task_completed", False):
+        return "planner"
+    if state.get("task_stuck", False):
         return "planner"
     return "observe"
 

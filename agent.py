@@ -24,6 +24,11 @@ def main():
     # 确保知识库目录存在
     os.makedirs(config.KB_DIR, exist_ok=True)
 
+    # 确保日志目录结构存在
+    log_subdirs = ["system", "planner", "knowledge", "tasks"]
+    for subdir in log_subdirs:
+        os.makedirs(os.path.join(config.LOG_DIR, subdir), exist_ok=True)
+
     # 编译 LangGraph 图
     compiled_graph = build_graph()
     log_colored("系统", "LangGraph 状态图已编译", Colors.WHITE)

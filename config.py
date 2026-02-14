@@ -22,10 +22,11 @@ TARGET_PORT = int(os.environ.get("AGENT_TARGET_PORT", 4000))
 
 # --- 智能体运行配置 ---
 MAX_HISTORY_ROUNDS = 50
-LOG_FILE = os.path.join(_SCRIPT_DIR, "agent_interaction.log")
-PLANNER_LOG_FILE = os.path.join(_SCRIPT_DIR, "planner_history.log")
-KNOWLEDGE_LOG_FILE = os.path.join(_SCRIPT_DIR, "knowledge_manager.log")
-TASK_LOG_DIR = os.path.join(_SCRIPT_DIR, "task_logs")
+LOG_DIR = os.path.join(_SCRIPT_DIR, "logs")
+LOG_FILE = os.path.join(LOG_DIR, "system", "interaction.log")
+PLANNER_LOG_FILE = os.path.join(LOG_DIR, "planner", "history.log")
+KNOWLEDGE_LOG_FILE = os.path.join(LOG_DIR, "knowledge", "manager.log")
+TASK_LOG_DIR = os.path.join(LOG_DIR, "tasks")
 KB_FILE = os.path.join(_SCRIPT_DIR, "knowledge_base.json")  # 保留兼容
 KB_DIR = os.path.join(_SCRIPT_DIR, "knowledge_bases")  # 阶段化知识库目录
 KB_CONSOLIDATION_INTERVAL = 20  # 每隔 N 轮整理一次知识库

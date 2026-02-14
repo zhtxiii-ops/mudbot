@@ -51,7 +51,8 @@ class LLMClient:
 
     def call_with_retry(self, system_prompt: str, user_content: str,
                         json_mode: bool = True, validator=None,
-                        retry_delay: float = 2.0, model: str = None):
+                        retry_delay: float = 2.0, model: str = None,
+                        caller_id: str = "Unknown"):
         """
         循环调用 LLM 直到成功（通过 validator 校验）。
         
@@ -62,6 +63,7 @@ class LLMClient:
             validator: 可选的验证函数，接受 LLM 返回值，通过返回 True
             retry_delay: 重试间隔（秒）
             model: 可选的模型名称覆盖默认值
+            caller_id: 调用者标识，用于日志追踪
         
         Returns:
             LLM 返回结果（已通过 validator 校验）
@@ -74,7 +76,7 @@ class LLMClient:
                     if validator(result):
                         return result
                     else:
-                        print(f"[LLM] 返回结果未通过验证，{retry_delay}秒后重试...")
+                        print(f"[LLM][{caller_id}] 返回结果未通过验证，{retry_delay}秒后重试...")
                         time.sleep(retry_delay)
                         retry_delay = min(retry_delay * 2, 60.0)  # Exponential backoff, max 60s
                         continue
@@ -82,7 +84,7 @@ class LLMClient:
                 return result
 
             except Exception as e:
-                print(f"[LLM] 调用失败: {e}。{retry_delay}秒后重试...")
+                print(f"[LLM][{caller_id}] 调用失败: {e}。{retry_delay}秒后重试...")
                 time.sleep(retry_delay)
                 retry_delay = min(retry_delay * 2, 60.0)  # Exponential backoff, max 60s
 

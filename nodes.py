@@ -262,6 +262,7 @@ def analyze(state: AgentState) -> dict:
         system_prompt, user_msg,
         json_mode=True,
         validator=main_logic_validator,
+        caller_id=f"Analyze[{task_id}]"
     )
 
     # 解析决策
@@ -455,6 +456,7 @@ def manage_knowledge(state: AgentState) -> dict:
         system_prompt, user_msg,
         json_mode=True,
         validator=kb_validator,
+        caller_id=f"KnowledgeManager[Phase{phase}]"
     )
 
     kb_focus = result.get("kb_focus", "")
@@ -484,8 +486,15 @@ def manage_knowledge(state: AgentState) -> dict:
         if is_dup:
             log_knowledge("DUPLICATE", f"跳过重复: {content}")
             continue
-        knowledge_base.append({"content": content, "category": category})
-        log_knowledge("ADD", f"[{category}] {content}")
+
+        new_entry = {
+            "content": content,
+            "category": category,
+            "keywords": entry.get("keywords", []),
+            "specific_type": entry.get("类别", "unknown")
+        }
+        knowledge_base.append(new_entry)
+        log_knowledge("ADD", f"[{category}] {content} (Tags: {new_entry['keywords']}, Type: {new_entry['specific_type']})")
         # log_colored("知识管理", f"新增知识 [{category}]: {content}", Colors.MAGENTA) # 仅在详细日志中记录
         added_count += 1
 
@@ -548,22 +557,30 @@ def _consolidate_knowledge(llm, knowledge_base, phase, phase_name):
 {{
     "reasoning": "整理思路...",
     "consolidated_entries": [
-        {{"content": "整理后的知识...", "category": "input_triggered 或 spontaneous"}}
+        {{"content": "整理后的知识...", "category": "...", "keywords": [...], "specific_type": "..."}}
     ]
 }}
 """
     def validator(res):
         return isinstance(res, dict) and "consolidated_entries" in res
 
-    result = llm.call_with_retry(system_prompt, "请整理知识库。", json_mode=True, validator=validator)
+    result = llm.call_with_retry(
+        system_prompt, "请整理知识库。", 
+        json_mode=True, validator=validator,
+        caller_id=f"KB-Consolidate[Phase{phase}]"
+    )
 
     entries = result.get("consolidated_entries", [])
     if entries:
-        valid_entries = [
-            {"content": e.get("content", ""), "category": e.get("category", "unknown")}
-            for e in entries
-            if isinstance(e, dict) and e.get("content")
-        ]
+        valid_entries = []
+        for e in entries:
+             if isinstance(e, dict) and e.get("content"):
+                 valid_entries.append({
+                     "content": e.get("content"),
+                     "category": e.get("category", "unknown"),
+                     "keywords": e.get("keywords", []),
+                     "specific_type": e.get("specific_type", "unknown")
+                 })
         if valid_entries:
             log_colored("知识管理", f"整理后知识库: {len(knowledge_base)} -> {len(valid_entries)} 条", Colors.MAGENTA)
             log_knowledge("CONSOLIDATE", f"整理后知识库: {len(knowledge_base)} -> {len(valid_entries)} 条")

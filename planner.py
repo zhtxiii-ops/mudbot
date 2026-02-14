@@ -299,7 +299,8 @@ def _generate_phase_tasks(llm, phase, completed_phases, knowledge_base, environm
 
     result = llm.call_with_retry(
         system_prompt, f"请为第 {phase} 阶段制定任务。",
-        json_mode=True, validator=validator, model=config.REASONER_MODEL
+        json_mode=True, validator=validator, model=config.REASONER_MODEL,
+        caller_id=f"Planner-GenerateTasks[Phase{phase}]"
     )
 
     tasks = []
@@ -327,7 +328,8 @@ def _determine_phase_name(llm, phase, completed_phases, knowledge_base, environm
 """
     result = llm.call_with_retry(
         system_prompt, f"请为第 {phase} 阶段命名。",
-        json_mode=True, model=config.REASONER_MODEL
+        json_mode=True, model=config.REASONER_MODEL,
+        caller_id=f"Planner-NamePhase[Phase{phase}]"
     )
     return result.get("phase_name", f"阶段{phase}")
 
@@ -353,7 +355,8 @@ def _create_execution_plan(llm, task, history, knowledge_base, phase, phase_name
 """
     result = llm.call_with_retry(
         system_prompt, f"请为任务 {task['id']} 制定执行计划。",
-        json_mode=True, model=config.REASONER_MODEL
+        json_mode=True, model=config.REASONER_MODEL,
+        caller_id=f"Planner-Plan[Task{task.get('id', '?')}]"
     )
     return result.get("plan", "观察服务器输出并做出适当响应。")
 
@@ -420,7 +423,8 @@ ID: {task.get('id')}
 """
     result = llm.call_with_retry(
         system_prompt, "请决策如何处理僵局任务。",
-        json_mode=True, model=config.REASONER_MODEL
+        json_mode=True, model=config.REASONER_MODEL,
+        caller_id=f"Planner-Stuck[Task{task.get('id', '?')}]"
     )
     
     action = result.get("action", "skip")

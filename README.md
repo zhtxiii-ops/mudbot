@@ -98,4 +98,7 @@ graph TD
 ### 3.3 监控
 - 实时日志: `tail -f agent_runtime.log`
 - 交互日志: `agent_interaction.log`
+- 规划者日志: `planner_history.log`
+- 知识管理日志: `knowledge_manager.log`
+- 任务详情日志: `task_logs/`
 - 知识库文件: `knowledge_bases/`

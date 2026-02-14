@@ -37,6 +37,37 @@ def log_colored(tag: str, message: str, color: str = None):
         f.write(formatted_msg + "\n")
 
 
+def log_knowledge(tag: str, message: str):
+    """写知识管理专属日志"""
+    timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
+    formatted_msg = f"[{timestamp}] [{tag}] {message}\n"
+    try:
+        with open(config.KNOWLEDGE_LOG_FILE, "a", encoding="utf-8") as f:
+            f.write(formatted_msg)
+    except Exception as e:
+        print(f"写入知识日志失败: {e}")
+
+
+def log_task(task_id: str, tag: str, message: str):
+    """写任务专属日志"""
+    if not task_id or task_id == "?":
+        return
+
+    timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
+    # 确保目录存在
+    if not os.path.exists(config.TASK_LOG_DIR):
+        os.makedirs(config.TASK_LOG_DIR, exist_ok=True)
+
+    log_file = os.path.join(config.TASK_LOG_DIR, f"{task_id}.log")
+    formatted_msg = f"[{timestamp}] [{tag}] {message}\n"
+
+    try:
+        with open(log_file, "a", encoding="utf-8") as f:
+            f.write(formatted_msg)
+    except Exception as e:
+        print(f"写入任务日志失败: {e}")
+
+
 def load_kb(phase: int = None) -> list[dict]:
     """
     从文件加载知识库。
@@ -222,7 +253,7 @@ def analyze(state: AgentState) -> dict:
 
     user_msg = f"服务器说：{server_output_clean}。根据任务 [{task_id}]，你的下一步行动是什么？"
 
-    print("[*] 思考中...")
+    # print("[*] 思考中...")
 
     def main_logic_validator(res):
         return isinstance(res, dict) and "analysis" in res
@@ -242,7 +273,17 @@ def analyze(state: AgentState) -> dict:
     llm_stuck = decision.get("task_stuck", False)
     llm_stuck_reason = decision.get("task_stuck_reason", "")
 
-    log_colored("分析", f"[{task_id}] (尝试 {task_attempts}/{config.MAX_TASK_ATTEMPTS}) {analysis}", Colors.CYAN)
+    log_colored("分析", f"[{task_id}] (尝试 {task_attempts}/{config.MAX_TASK_ATTEMPTS}) {analysis[:100]}...", Colors.CYAN)
+    
+    # 记录详细任务日志
+    log_task(task_id, "SERVER_OUTPUT", server_output_clean)
+    log_task(task_id, "ANALYSIS", analysis)
+    log_task(task_id, "PAYLOAD", payload)
+    log_task(task_id, "ATTEMPT", f"{task_attempts}/{config.MAX_TASK_ATTEMPTS}")
+    if env_type:
+        log_task(task_id, "ENV_TYPE", env_type)
+    if llm_stuck:
+        log_task(task_id, "STUCK", f"Reason: {llm_stuck_reason}")
 
     result = {
         "analysis": analysis,
@@ -256,10 +297,12 @@ def analyze(state: AgentState) -> dict:
     if env_type and env_type != "null" and env_type is not None:
         result["environment_type"] = env_type
         log_colored("分析", f"识别环境类型: {env_type}", Colors.CYAN)
+        log_task(task_id, "ENV_DETECTED", env_type)
 
     # 处理任务完成
     if task_done:
         log_colored("分析", f"任务 [{task_id}] 已完成: {task_result}", Colors.GREEN)
+        log_task(task_id, "COMPLETED", task_result)
         # 更新任务列表中的状态
         for t in tasks:
             if t["id"] == current_task.get("id"):
@@ -280,6 +323,7 @@ def analyze(state: AgentState) -> dict:
     if task_is_stuck:
         stuck_reason = llm_stuck_reason or f"任务已尝试 {task_attempts} 轮仍未完成，超过阈值 {config.MAX_TASK_ATTEMPTS}"
         log_colored("分析", f"任务 [{task_id}] 陷入僵局: {stuck_reason}", Colors.RED)
+        log_task(task_id, "STUCK_FINAL", stuck_reason)
         # 更新任务列表中的状态
         for t in tasks:
             if t["id"] == current_task.get("id"):
@@ -376,22 +420,25 @@ def manage_knowledge(state: AgentState) -> dict:
 "{server_output_clean}"
 
 你的任务：
-1. 根据当前阶段的任务，分析知识库建设的重点方向。
+1. 根据当前阶段的任务，分析知识库建设的重点方向,从而确定新信息的类别。
 2. 从交互历史中提取有价值的新信息，更新到知识库中,额外列出新信息中出现的与当前阶段任务相关的关键词。
 3. 每条知识必须标注类别 category：
    - "input_triggered": 这条信息是我们发送命令后，服务器响应中包含的信息
    - "spontaneous": 这条信息是没有我们输入也会产生的输出（如欢迎信息、系统广播、定时消息）
-4. 已存在于知识库中的重复信息不要再次添加。
-5. 无意义的系统噪音不要记录。
+4. 新信息中出现的关键词必须与当前阶段任务相关。
+5. 类别必须是当前阶段任务相关的具体类型。
+6. 已存在于知识库中的重复信息不要再次添加。
+7. 无意义的系统噪音不要记录。
 
 严格以 JSON 格式输出：
 {{
     "kb_focus": "当前阶段知识库建设的重点方向",
     "reasoning": "你的分析思路...",
     "new_entries": [
-        {{"content": "知识内容...", "category": "input_triggered 或 spontaneous"}}
+        {{"content": "知识内容...", "category": "input_triggered 或 spontaneous",
+        "keywords": ["关键词1", "关键词2", ...], "类别": "具体类型"}}
     ],
-    "keywords": ["关键词1", "关键词2", ...]
+    
 }}
 
 如果没有需要添加的新知识，new_entries 应为空列表 []。
@@ -399,7 +446,7 @@ def manage_knowledge(state: AgentState) -> dict:
 
     user_msg = "请审查交互历史并更新当前阶段的知识库。"
 
-    log_colored("知识管理", f"正在审查交互历史（阶段 {phase}）...", Colors.MAGENTA)
+    # log_colored("知识管理", f"正在审查交互历史（阶段 {phase}）...", Colors.MAGENTA)
 
     def kb_validator(res):
         return isinstance(res, dict) and "new_entries" in res and isinstance(res.get("new_entries"), list)
@@ -415,11 +462,10 @@ def manage_knowledge(state: AgentState) -> dict:
     reasoning = result.get("reasoning", "")
 
     if kb_focus:
-        # log_colored("知识管理", f"知识建设重点: {kb_focus}", Colors.MAGENTA)
-        pass
+        log_knowledge("FOCUS", kb_focus)
+        
     if reasoning:
-        # log_colored("知识管理", f"审查结论: {reasoning}", Colors.MAGENTA)
-        pass
+        log_knowledge("REASONING", reasoning)
 
     added_count = 0
     for entry in new_entries:
@@ -436,18 +482,21 @@ def manage_knowledge(state: AgentState) -> dict:
             if isinstance(e, dict)
         )
         if is_dup:
-            # log_colored("知识管理", f"跳过重复: {content}", Colors.RESET)
+            log_knowledge("DUPLICATE", f"跳过重复: {content}")
             continue
         knowledge_base.append({"content": content, "category": category})
-        log_colored("知识管理", f"新增知识 [{category}]: {content}", Colors.MAGENTA)
+        log_knowledge("ADD", f"[{category}] {content}")
+        # log_colored("知识管理", f"新增知识 [{category}]: {content}", Colors.MAGENTA) # 仅在详细日志中记录
         added_count += 1
 
     counter += 1
 
     if added_count > 0:
         save_kb(knowledge_base, phase=phase)
-        log_colored("知识管理", f"共新增 {added_count} 条知识，已持久化。", Colors.MAGENTA)
+        # log_colored("知识管理", f"共新增 {added_count} 条知识，已持久化。", Colors.MAGENTA)
+        log_knowledge("PERSIST", f"共新增 {added_count} 条知识，已持久化。")
     else:
+        log_knowledge("INFO", "无需更新知识库。")
         # log_colored("知识管理", "无需更新知识库。", Colors.RESET)
         pass
 
@@ -517,6 +566,7 @@ def _consolidate_knowledge(llm, knowledge_base, phase, phase_name):
         ]
         if valid_entries:
             log_colored("知识管理", f"整理后知识库: {len(knowledge_base)} -> {len(valid_entries)} 条", Colors.MAGENTA)
+            log_knowledge("CONSOLIDATE", f"整理后知识库: {len(knowledge_base)} -> {len(valid_entries)} 条")
             return valid_entries
 
     return knowledge_base

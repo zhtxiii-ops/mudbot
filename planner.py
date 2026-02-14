@@ -10,12 +10,29 @@ from config import Colors
 from state import AgentState
 
 
+import datetime
+
 from nodes import log_colored, get_aggregated_kb
 
 
 def _log(tag: str, message: str, color: str = None):
     """复用日志函数"""
     log_colored(tag, message, color)
+
+
+def _log_planner_event(event_type: str, message: str):
+    """
+    记录 Planner 专属日志
+    格式: [时间] [事件类型] 消息
+    """
+    timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    log_line = f"[{timestamp}] [{event_type}] {message}\n"
+    
+    try:
+        with open(config.PLANNER_LOG_FILE, "a", encoding="utf-8") as f:
+            f.write(log_line)
+    except Exception as e:
+        _log("PlannerLog", f"写入日志失败: {e}", Colors.RED)
 
 
 # ============================================================
@@ -75,6 +92,7 @@ def planner(state: AgentState) -> dict:
         if phase == 1:
             tasks = [dict(t) for t in PHASE1_TASKS]  # 深拷贝
             _log("规划者", f"第一阶段固定任务已加载（{len(tasks)}个任务）", Colors.BLUE)
+            _log_planner_event("PHASE_START", f"开始阶段 {phase}: {phase_name} (任务数: {len(tasks)})")
         else:
             # 获取全量知识用于规划
             full_kb = get_aggregated_kb(phase, knowledge_base)
@@ -82,6 +100,9 @@ def planner(state: AgentState) -> dict:
                 llm, phase, completed_phases, full_kb, environment_type
             )
             _log("规划者", f"第{phase}阶段任务已生成（{len(tasks)}个任务）", Colors.BLUE)
+            _log_planner_event("PHASE_START", f"开始阶段 {phase}: {state.get('phase_name', '未命名')} (任务数: {len(tasks)})")
+            for t in tasks:
+                 _log_planner_event("TASK_GENERATED", f"[{t['id']}] {t['description']}")
 
     # ------------------------------------------------------------------
     # 步骤1.5：处理 stuck 任务 (优先于阶段完成检查)
@@ -111,14 +132,13 @@ def planner(state: AgentState) -> dict:
                      pass
                 break
         
-        # 清除 stuck 状态
-        return {
-            "tasks": tasks,
-            "current_task": {},  # 清空当前任务，让规划者重新分配
-            "task_stuck": False,
-            "task_stuck_reason": "",
-            "task_attempts": 0,
-        }
+        # 更新本地变量，以便流程继续
+        task_stuck = False
+        state["task_stuck"] = False
+        current_task = {}  # 重置当前任务，让后续逻辑重新分配
+        
+        _log("规划者", "僵局任务处理完毕，继续检查后续任务...", Colors.CYAN)
+        _log_planner_event("TASK_STUCK_HANDLED", f"[{task_id}] 状态更新为: {action_updates.get('status')} | 原因: {stuck_reason}")
 
     # ------------------------------------------------------------------
     # 步骤2：检查是否所有任务完成 → 推进阶段
@@ -147,6 +167,7 @@ def planner(state: AgentState) -> dict:
             "key_findings": _extract_key_findings(tasks),
         }
         completed_phases.append(phase_summary)
+        _log_planner_event("PHASE_COMPLETE", f"阶段 {phase} 完成。关键发现: {phase_summary['key_findings']}")
 
         # 推进到新阶段
         new_phase = phase + 1
@@ -157,6 +178,9 @@ def planner(state: AgentState) -> dict:
         new_tasks = _generate_phase_tasks(llm, new_phase, completed_phases, full_kb_for_planning, environment_type)
 
         _log("规划者", f"进入阶段 {new_phase}: {new_phase_name}（{len(new_tasks)}个任务）", Colors.BLUE)
+        _log_planner_event("PHASE_START", f"开始阶段 {new_phase}: {new_phase_name} (任务数: {len(new_tasks)})")
+        for t in new_tasks:
+             _log_planner_event("TASK_GENERATED", f"[{t['id']}] {t['description']}")
 
         # 选取新阶段的第一个任务
         first_task = new_tasks[0] if new_tasks else {}
@@ -211,6 +235,8 @@ def planner(state: AgentState) -> dict:
 
     _log("规划者", f"分配任务 [{next_task['id']}]: {next_task['description'][:60]}...", Colors.BLUE)
     _log("规划者", f"执行计划: {plan[:100]}...", Colors.CYAN)
+    
+    _log_planner_event("TASK_ASSIGNED", f"分配任务 [{next_task['id']}]")
 
     return {
         "tasks": tasks,

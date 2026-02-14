@@ -7,10 +7,26 @@
 ### 0.1 职责分离
 - **Planner (规划者)**: 独立于执行循环。负责宏观阶段划分、任务生成和具体执行计划的制定。使用强大的推理模型（`deepseek-reasoner`）进行深思熟虑的决策。
 - **Executor (执行循环)**: 负责具体的交互、观察和快速反应。使用高效的对话模型（`deepseek-chat`）。
-- **Knowledge Manager (知识管理员)**: 负责维护阶段化知识库，与执行动作**并行运行**，不阻塞主流程。
+### 2.5 知识管理者 (Knowledge Manager)
+- **职责**: 维护长期记忆，支持跨任务信息检索。
+- **并行执行**: 独立于主执行循环，在后台线程中处理知识更新。
+
+### 2.6 反思者 (Reflector)
+- **职责**: 在任务完成或失败后，分析执行日志，总结经验（Experiences）和提炼技能（Skills）。
+- **闭环优化**: 将反思结果注入到分析和规划节点的 Context 中，持续提升智能体表现。
+- **持久化**: 经验和技能存储在 `reflections/experiences.json`。
 
 ### 0.2 并行执行流
 为了提高交互效率，知识管理节点（KB Update）被移至后台线程，与分析（Analyze）和行动（Act）节点并行执行。
+
+```
+├── task6/
+│   ├── logs/               # 日志目录 (system, planner, knowledge, tasks, reflector)
+│   ├── reflections/        # 反思数据 (experiences.json)
+│   ├── knowledge_bases/    # 阶段化知识库
+│   ├── agent.py            # 主入口
+│   ├── reflector.py        # 反思者模块
+```
 
 ```mermaid
 graph TD
@@ -56,10 +72,17 @@ graph TD
 
 ## 2. 流程详解 (Processing Flow)
 
-### 第一步：规划 (Planning)
-**Planner** 节点被调用。它分析当前的阶段、已完成的任务和全量知识库。
+### 第一步：反思 (Reflection)
+**Reflector** 节点在任务完成或失败后被调用。
+- 分析上一个任务的执行日志。
+- 提取经验教训和可复用的技能。
+- *模型*: `deepseek-reasoner`
+- 结果存入 `reflections/experiences.json` 并反馈给规划者。
+
+### 第二步：规划 (Planning)
+**Planner** 节点被调用。它分析当前的阶段、已完成的任务、全量知识库以及**反思总结的经验与技能**。
 - 如果是新阶段，生成该阶段的任务列表。
-- 选择下一个待执行任务，制定详细的执行计划。
+- 选择下一个待执行任务，制定详细的执行计划（引用可用技能）。
 - *模型*: `deepseek-reasoner`
 
 ### 第二步：观察与启动 (Observe & Start)
@@ -99,6 +122,8 @@ graph TD
 - 实时日志: `tail -f logs/system/runtime.log`
 - 交互日志: `logs/system/interaction.log`
 - 规划者日志: `logs/planner/history.log`
+- 反思者日志: `logs/reflector/reflections.log`
 - 知识管理日志: `logs/knowledge/manager.log`
 - 任务详情日志: `logs/tasks/`
 - 知识库文件: `knowledge_bases/`
+- 经验库文件: `reflections/experiences.json`

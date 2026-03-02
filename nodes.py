@@ -194,6 +194,8 @@ def analyze(state: AgentState) -> dict:
     phase_name = state.get("phase_name", "未知")
     environment_type = state.get("environment_type", "unknown")
     task_attempts = state.get("task_attempts", 0) + 1  # 递增尝试计数
+    experiences = state.get("experiences", [])
+    skills = state.get("skills", [])
 
     # 构建知识库字符串（使用聚合后的全量知识）
     full_kb = get_aggregated_kb(phase, knowledge_base)
@@ -211,6 +213,24 @@ def analyze(state: AgentState) -> dict:
     recent_history = history[-config.MAX_HISTORY_ROUNDS:]
     history_str = "\n".join(recent_history)
 
+    # 构建经验与技能上下文
+    exp_str = ""
+    if experiences:
+        # 简单策略：只显示最近的 5 条经验，或者提取相关的 (这里简化处理)
+        # TODO: 引入向量检索或关键词匹配
+        recent_exps = experiences[-5:] 
+        exp_str = "参考经验:\n" + "\n".join([f"- {e.get('summary')} ({e.get('lesson')})" for e in recent_exps])
+    else:
+        exp_str = "暂无相关经验。"
+
+    skill_str = ""
+    if skills:
+        skill_str = "可用技能:\n"
+        for s in skills:
+            skill_str += f"- {s.get('name')}: {s.get('description')} (触发条件: {s.get('trigger')})\n  步骤: {', '.join(s.get('steps', []))}\n"
+    else:
+        skill_str = "暂无可用技能。"
+
     # 当前任务信息
     task_desc = current_task.get("description", "无特定任务")
     task_plan = current_task.get("plan", "无特定计划")
@@ -225,6 +245,10 @@ def analyze(state: AgentState) -> dict:
 
 当前知识库:
 {kb_str}
+
+{exp_str}
+
+{skill_str}
 
 交互历史 (Client -> Server)，也就是你最近和服务器的对话过程记录:
 {history_str}

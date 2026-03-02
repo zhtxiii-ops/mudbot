@@ -1,0 +1,1005 @@
+{
+  "experiences": [
+    {
+      "summary": "Successfully identified a text-based interactive environment from server output.",
+      "lesson": "By receiving and decoding the initial server data, it was found that readable text with coherent language and MUD-specific prompts (e.g., '您的英文名字：') indicates a text-based environment; no binary or garbled content was present, confirming text-based interaction.",
+      "tags": [
+        "text-detection",
+        "MUD-environment",
+        "decoding"
+      ],
+      "id": "EXP-1771110645-0",
+      "task_id": "P1-T1",
+      "phase": 1,
+      "created_at": "2026-02-15T07:10:45.966928"
+    },
+    {
+      "summary": "Successfully identified MUD environment using initial text clues without further interaction",
+      "lesson": "In text-based environments, initial server output such as welcome messages, game names, descriptions, and prompts often contains sufficient information to determine the environment type efficiently, avoiding unnecessary commands and saving time.",
+      "tags": [
+        "environment analysis",
+        "efficiency",
+        "text-based games"
+      ],
+      "id": "EXP-1771110714-1",
+      "task_id": "P1-T2",
+      "phase": 1,
+      "created_at": "2026-02-15T07:11:54.677765"
+    },
+    {
+      "summary": "English name input triggers a multi-step character creation confirmation process.",
+      "lesson": "In this MUD, entering an English name for a new character requires user confirmation before proceeding to additional steps such as Chinese name input and password setting, indicating a structured registration sequence.",
+      "tags": [
+        "registration",
+        "server_interaction"
+      ],
+      "id": "EXP-1771110838-2",
+      "task_id": "P2-T1",
+      "phase": 2,
+      "created_at": "2026-02-15T07:13:58.885247"
+    },
+    {
+      "summary": "Server sequentially prompts for multiple inputs after name acceptance.",
+      "lesson": "The character creation process follows a predictable sequence: confirmation after English name, Chinese name input, and password setting, which must be addressed in order to complete registration.",
+      "tags": [
+        "character_creation",
+        "step_sequence"
+      ],
+      "id": "EXP-1771110838-3",
+      "task_id": "P2-T1",
+      "phase": 2,
+      "created_at": "2026-02-15T07:13:58.885247"
+    },
+    {
+      "summary": "Character creation follows a linear sequence of server prompts after name acceptance.",
+      "lesson": "After the server accepts a name, it sequentially requests password confirmation, email address, and gender selection, with each correct input leading directly to the next step and ultimately game entry, demonstrating a predictable and structured registration flow.",
+      "tags": [
+        "character_creation",
+        "server_prompts",
+        "progression_flow"
+      ],
+      "id": "EXP-1771110927-4",
+      "task_id": "P2-T2",
+      "phase": 2,
+      "created_at": "2026-02-15T07:15:27.400656"
+    },
+    {
+      "summary": "Standard registration inputs are processed smoothly without errors when properly formatted.",
+      "lesson": "Using common formats for inputs like passwords and email addresses results in immediate acceptance and progression, indicating that the server has basic validation but does not require complex handling in this scenario.",
+      "tags": [
+        "input_validation",
+        "error_avoidance",
+        "registration_efficiency"
+      ],
+      "id": "EXP-1771110927-5",
+      "task_id": "P2-T2",
+      "phase": 2,
+      "created_at": "2026-02-15T07:15:27.400656"
+    },
+    {
+      "summary": "Help outputs in this MUD are paginated and require navigation.",
+      "lesson": "When using 'help' commands or other long outputs, the server presents paginated content with prompts like '== 未完继续 XX% ==', and users must send ENTER to continue, 'q' to leave, or 'b' to go back to previous pages, which is essential for reading complete information.",
+      "tags": [
+        "pagination",
+        "help_system",
+        "output_format"
+      ],
+      "id": "EXP-1771111788-6",
+      "task_id": "P2-T3",
+      "phase": 2,
+      "created_at": "2026-02-15T07:29:48.264836"
+    },
+    {
+      "summary": "Discovered the core health system based on '精', '气', '神' attributes.",
+      "lesson": "The game uses '精' (energy), '气' (vitality), and '神' (spirit) as fundamental health metrics, each with current, state, and maximum values that affect recovery, combat, and skills, learned through 'help health' command.",
+      "tags": [
+        "game_mechanics",
+        "health",
+        "attributes"
+      ],
+      "id": "EXP-1771111788-7",
+      "task_id": "P2-T3",
+      "phase": 2,
+      "created_at": "2026-02-15T07:29:48.264836"
+    },
+    {
+      "summary": "Commands like 'help' have hierarchical topics for detailed exploration.",
+      "lesson": "The 'help' command provides a list of sub-topics (e.g., 'cmds', 'setup', 'health', 'story'), and inputting 'help <topic>' yields specific information, allowing systematic learning of game functions and lore.",
+      "tags": [
+        "command_hierarchy",
+        "exploration",
+        "help_topics"
+      ],
+      "id": "EXP-1771111788-8",
+      "task_id": "P2-T3",
+      "phase": 2,
+      "created_at": "2026-02-15T07:29:48.264836"
+    },
+    {
+      "summary": "Using 'look' before and after moving ensures accurate location tracking and exploration.",
+      "lesson": "The agent learned that to safely and effectively move to a new location, it should first execute 'look' to confirm the current location's exits, then use 'go [direction]' to move, and upon arrival, immediately use 'look' again to observe the new environment, exits, NPCs, and optional commands like 'id here' for entity names, enhancing map expansion.",
+      "tags": [
+        "exploration",
+        "command-sequence"
+      ],
+      "id": "EXP-1771112045-9",
+      "task_id": "P3-T1",
+      "phase": 3,
+      "created_at": "2026-02-15T07:34:05.160888"
+    },
+    {
+      "summary": "Successful navigation with 'go' commands expands map knowledge by revealing new locations with multiple exits and NPCs.",
+      "lesson": "Moving from one location to another (e.g., 'go east' from 饮风客栈 to 广场) can unveil areas with various exits (e.g., south, north, east, west) and common NPCs like Travelers, demonstrating the dynamic nature of the environment without observed events in this instance.",
+      "tags": [
+        "navigation",
+        "mud-commands"
+      ],
+      "id": "EXP-1771112045-10",
+      "task_id": "P3-T1",
+      "phase": 3,
+      "created_at": "2026-02-15T07:34:05.160888"
+    },
+    {
+      "summary": "The 'say' command only displays player speech without triggering direct NPC responses.",
+      "lesson": "In this MUD environment, using 'say' with NPCs does not elicit immediate replies, indicating that NPC interaction may rely on other commands or specific conditions for meaningful dialogue.",
+      "tags": [
+        "command_usage",
+        "NPC_interaction"
+      ],
+      "id": "EXP-1771112555-11",
+      "task_id": "P3-T2",
+      "phase": 3,
+      "created_at": "2026-02-15T07:42:35.334859"
+    },
+    {
+      "summary": "NPC responses to 'ask' commands are limited to specific keywords or topics.",
+      "lesson": "NPCs have predefined dialogue triggers; topics outside this set result in standard negative responses like refusal or lack of knowledge, suggesting a scripted dialogue system.",
+      "tags": [
+        "dialogue_mechanics",
+        "keyword_dependence"
+      ],
+      "id": "EXP-1771112555-12",
+      "task_id": "P3-T2",
+      "phase": 3,
+      "created_at": "2026-02-15T07:42:35.334859"
+    },
+    {
+      "summary": "NPCs can initiate autonomous behaviors without player commands.",
+      "lesson": "NPCs, such as the waiter, may perform actions like welcoming players spontaneously, indicating dynamic events or environmental triggers that can provide context without direct interaction.",
+      "tags": [
+        "NPC_behavior",
+        "event_triggers"
+      ],
+      "id": "EXP-1771112555-13",
+      "task_id": "P3-T2",
+      "phase": 3,
+      "created_at": "2026-02-15T07:42:35.334859"
+    },
+    {
+      "summary": "Systematic testing of multiple dialogue topics helps identify NPC response patterns.",
+      "lesson": "By trying various topics with 'ask' commands based on environment descriptions, players can map out NPC knowledge limits and potential triggers, even if no immediate success is achieved.",
+      "tags": [
+        "exploration",
+        "testing_methodology"
+      ],
+      "id": "EXP-1771112555-14",
+      "task_id": "P3-T2",
+      "phase": 3,
+      "created_at": "2026-02-15T07:42:35.334859"
+    },
+    {
+      "summary": "Engaging in combat with low character stats can lead to immediate death and reset of attributes.",
+      "lesson": "Using the 'kill' command initiates combat, but if the character's health (精、气、神) is low, it results in death, which resets health to minimal levels (1/100), clears all inventory items, and moves the character to a respawn location like the temple. This highlights the risk of combat without adequate preparation.",
+      "tags": [
+        "combat",
+        "death",
+        "risk assessment"
+      ],
+      "id": "EXP-1771113271-15",
+      "task_id": "P3-T3",
+      "phase": 3,
+      "created_at": "2026-02-15T07:54:31.229292"
+    },
+    {
+      "summary": "Items equipped with 'wear' command are lost upon character death, indicating no persistence.",
+      "lesson": "The 'wear [item]' command successfully equips items, as confirmed by system responses, but death removes all items from inventory, showing that equipped items do not survive death. This emphasizes the consequences of dying in the environment.",
+      "tags": [
+        "item usage",
+        "death consequences"
+      ],
+      "id": "EXP-1771113271-16",
+      "task_id": "P3-T3",
+      "phase": 3,
+      "created_at": "2026-02-15T07:54:31.229292"
+    },
+    {
+      "summary": "The 'use' command failed for the paper seal, indicating potential item usability limitations.",
+      "lesson": "When attempting to use an item with commands like 'use [item name]' and receiving a response of '什么？' or similar, it suggests the item may not support direct usage in this environment, or the command syntax might be incorrect. This highlights the need to explore alternative commands or verify item descriptions for usage instructions.",
+      "tags": [
+        "command_failure",
+        "item_interaction"
+      ],
+      "id": "EXP-1771113570-17",
+      "task_id": "P4-T1",
+      "phase": 4,
+      "created_at": "2026-02-15T07:59:30.941963"
+    },
+    {
+      "summary": "Items can be reliably picked up and dropped using 'get' and 'drop' commands, with inventory verification.",
+      "lesson": "Standard item manipulation commands 'get [item name]' and 'drop [item name]' are effective for acquiring and discarding items. Using 'inventory' confirms item status, and responses like '你捡起一叠桃符纸' or '你丢下一叠桃符纸' indicate success, including descriptive details such as value ('不值钱').",
+      "tags": [
+        "item_management",
+        "command_success"
+      ],
+      "id": "EXP-1771113570-18",
+      "task_id": "P4-T1",
+      "phase": 4,
+      "created_at": "2026-02-15T07:59:30.941963"
+    },
+    {
+      "summary": "Dropped items may persist or respawn in the environment, visible with the 'look' command.",
+      "lesson": "After discarding an item with 'drop', using 'look' might show the item still present in the location, suggesting that items can have static presence or respawn mechanisms, allowing for repeated interactions without permanent removal.",
+      "tags": [
+        "environment_persistence",
+        "item_behavior"
+      ],
+      "id": "EXP-1771113570-19",
+      "task_id": "P4-T1",
+      "phase": 4,
+      "created_at": "2026-02-15T07:59:30.941963"
+    },
+    {
+      "summary": "NPCs can actively prompt players for actions without prior interaction.",
+      "lesson": "In this MUD, NPCs like the temple keeper may initiate dialogue unprompted, providing hints or requests (e.g., asking for donations) that can trigger events or serve as quest clues. This indicates that players should pay attention to NPC speech for opportunities to advance interactions.",
+      "tags": [
+        "NPC interaction",
+        "dialogue prompt",
+        "quest initiation"
+      ],
+      "id": "EXP-1771114465-20",
+      "task_id": "P4-T2",
+      "phase": 4,
+      "created_at": "2026-02-15T08:14:25.693765"
+    },
+    {
+      "summary": "Donation interactions fail without required items or correct command syntax.",
+      "lesson": "Attempting to donate using commands like 'donate to denotation box' or 'give coin to keeper' without possessing the necessary item (e.g., coins) or with incorrect command format leads to failure responses (e.g., '什么？>'). Environment descriptions (e.g., '你可以把想捐的钱放进去') hint at actions but do not specify exact commands, requiring trial and error or item acquisition.",
+      "tags": [
+        "item dependency",
+        "command syntax",
+        "interaction failure"
+      ],
+      "id": "EXP-1771114465-21",
+      "task_id": "P4-T2",
+      "phase": 4,
+      "created_at": "2026-02-15T08:14:25.693765"
+    },
+    {
+      "summary": "Escape commands like 'flee' and 'run' did not trigger escape during combat.",
+      "lesson": "In this MUD, testing 'flee', 'run', and 'escape' commands during combat with a Traveler resulted in continued combat interactions (e.g., '你注视著旅客的行动...') without any escape effect or location change. This suggests that the escape mechanism may not be implemented or that these commands are invalid for fleeing, indicating limited combat options.",
+      "tags": [
+        "combat",
+        "escape",
+        "command_effectiveness"
+      ],
+      "id": "EXP-1771115217-22",
+      "task_id": "P4-T3",
+      "phase": 4,
+      "created_at": "2026-02-15T08:26:57.212317"
+    },
+    {
+      "summary": "Using 'quit' during combat led to session disconnection and login loops.",
+      "lesson": "Inputting 'quit' while in combat caused the session to terminate, leading to a login interface or character creation prompts, such as '您的英文名字：' and '使用 [name] 这个名字将会创造一个新的人物'. This disruption required recovery steps to resume gameplay, highlighting that 'quit' can unpredictably affect session state in combat scenarios.",
+      "tags": [
+        "session_management",
+        "quit_command",
+        "interruption"
+      ],
+      "id": "EXP-1771115217-23",
+      "task_id": "P4-T3",
+      "phase": 4,
+      "created_at": "2026-02-15T08:26:57.212317"
+    },
+    {
+      "summary": "Help command outputs are frequently paginated, requiring active navigation to read fully.",
+      "lesson": "When using 'help' commands, always monitor for pagination prompts (e.g., '== 未完继续 % ==') and send ENTER (empty string) repeatedly to read all pages before proceeding; failing to do so can lead to incomplete information and task delays.",
+      "tags": [
+        "help_system",
+        "pagination"
+      ],
+      "id": "EXP-1771116288-24",
+      "task_id": "P4-T4",
+      "phase": 4,
+      "created_at": "2026-02-15T08:44:48.385193"
+    },
+    {
+      "summary": "Not all game mechanics topics have dedicated help files, as some commands return no information.",
+      "lesson": "If 'help <topic>' returns a response like '没有针对这项主题的说明文件', note that the topic may not be supported directly; try alternative related topics or in-game commands to infer the mechanics instead of repeatedly querying the same topic.",
+      "tags": [
+        "help_system",
+        "topic_research"
+      ],
+      "id": "EXP-1771116288-25",
+      "task_id": "P4-T4",
+      "phase": 4,
+      "created_at": "2026-02-15T08:44:48.385193"
+    },
+    {
+      "summary": "Excessive retries on the same command without progression can cause task timeout.",
+      "lesson": "To avoid getting stuck, set a maximum attempt limit per command during exploration (e.g., 3-5 tries) and move on to other topics if no progress is made, ensuring efficient task management and preventing loops.",
+      "tags": [
+        "task_efficiency",
+        "timeout_management"
+      ],
+      "id": "EXP-1771116288-26",
+      "task_id": "P4-T4",
+      "phase": 4,
+      "created_at": "2026-02-15T08:44:48.385193"
+    },
+    {
+      "summary": "The 'donate' command was not recognized in this environment.",
+      "lesson": "When encountering unfamiliar commands like 'donate', first check their validity using 'help [command]'; if no help file exists (e.g., '没有针对这项主题的说明文件'), the command may be invalid, require specific parameters, or need alternative actions such as using 'put' for donations.",
+      "tags": [
+        "command validity",
+        "help system"
+      ],
+      "id": "EXP-1771117325-27",
+      "task_id": "P5-T1",
+      "phase": 5,
+      "created_at": "2026-02-15T09:02:05.121732"
+    },
+    {
+      "summary": "Donating items to a container requires the item to be in the character's inventory.",
+      "lesson": "Before executing commands like 'put [item] in [container]', always verify that the item is possessed by checking inventory or picking it up from the environment to avoid errors such as '你身上没有这样东西'.",
+      "tags": [
+        "inventory check",
+        "donation mechanics"
+      ],
+      "id": "EXP-1771117325-28",
+      "task_id": "P5-T1",
+      "phase": 5,
+      "created_at": "2026-02-15T09:02:05.121732"
+    },
+    {
+      "summary": "NPCs did not provide quest information through direct 'ask' or 'say' commands.",
+      "lesson": "Quest activation may rely on specific environmental interactions (e.g., donating items) rather than simple dialogue; when NPCs respond negatively (e.g., '无可奉告'), explore alternative actions like examining objects or using different commands.",
+      "tags": [
+        "NPC interaction",
+        "quest triggers"
+      ],
+      "id": "EXP-1771117325-29",
+      "task_id": "P5-T1",
+      "phase": 5,
+      "created_at": "2026-02-15T09:02:05.121732"
+    },
+    {
+      "summary": "Donating paper seals to the donation box did not activate the quest.",
+      "lesson": "Not all items can trigger quest activation; specific items like coins might be required, indicating that quest mechanics may involve item specificity or hidden conditions.",
+      "tags": [
+        "quest_failure",
+        "item_specificity"
+      ],
+      "id": "EXP-1771118574-30",
+      "task_id": "P5-T1",
+      "phase": 5,
+      "created_at": "2026-02-15T09:22:54.698422"
+    },
+    {
+      "summary": "NPC queries about coins were consistently refused or unhelpful.",
+      "lesson": "Some NPCs may not possess or share information on certain topics, necessitating exploration of alternative sources or methods to find required items.",
+      "tags": [
+        "npc_limitation",
+        "information_block"
+      ],
+      "id": "EXP-1771118574-31",
+      "task_id": "P5-T1",
+      "phase": 5,
+      "created_at": "2026-02-15T09:22:54.698422"
+    },
+    {
+      "summary": "Examining items with 'look' provided detailed descriptions and confirmed usability.",
+      "lesson": "The 'look' command, when used on specific objects, reveals additional details that can aid in understanding item purposes and potential interactions in the environment.",
+      "tags": [
+        "command_effectiveness",
+        "exploration_detail"
+      ],
+      "id": "EXP-1771118574-32",
+      "task_id": "P5-T1",
+      "phase": 5,
+      "created_at": "2026-02-15T09:22:54.698422"
+    },
+    {
+      "summary": "Skill learning may not be available in all explored areas, requiring specific NPCs or conditions.",
+      "lesson": "The agent explored multiple locations like city god temple, loess trail, mountain path, forest clearing, and downhill path, but found no skill learning opportunities, indicating that skill acquisition might depend on discovering particular characters or places, possibly with prerequisites like items or time that were not met.",
+      "tags": [
+        "skill acquisition",
+        "exploration limitations"
+      ],
+      "id": "EXP-1771119760-33",
+      "task_id": "P5-T2",
+      "phase": 5,
+      "created_at": "2026-02-15T09:42:40.745615"
+    },
+    {
+      "summary": "Hostile NPCs can automatically initiate combat, disrupting exploration and task progression.",
+      "lesson": "During the search for skill learning, encounters with bandits triggered immediate combat, which consumed attempts and interfered with the agent's ability to explore further, highlighting the need for strategies to avoid or quickly resolve such combat to stay focused on objectives.",
+      "tags": [
+        "NPC aggression",
+        "task interruption"
+      ],
+      "id": "EXP-1771119760-34",
+      "task_id": "P5-T2",
+      "phase": 5,
+      "created_at": "2026-02-15T09:42:40.745615"
+    },
+    {
+      "summary": "Repeated movement between the same exits can lead to navigation loops without discovering new areas.",
+      "lesson": "The agent got stuck moving back and forth between locations like the downhill path and forest path, without finding new exits, emphasizing the importance of systematically mapping exits and trying untested directions to avoid circular navigation and enhance exploration efficiency.",
+      "tags": [
+        "navigation",
+        "stuck prevention"
+      ],
+      "id": "EXP-1771119760-35",
+      "task_id": "P5-T2",
+      "phase": 5,
+      "created_at": "2026-02-15T09:42:40.745615"
+    }
+  ],
+  "skills": [
+    {
+      "name": "Check for Text-Based Environment",
+      "description": "Analyzes initial server data to determine if a socket connection provides a text-based interface, such as a MUD.",
+      "trigger": "After establishing a connection to a server or upon receiving the first data packet when the environment type is unknown.",
+      "steps": [
+        "Wait for and receive the initial output from the server.",
+        "Attempt to decode the received data using standard text encodings (e.g., UTF-8).",
+        "Inspect the decoded content for readability, including natural language characters, punctuation, and interactive prompts.",
+        "If decoding is successful and the content is coherent with text elements, classify as text-based; otherwise, if decoding fails or binary data is found, classify as non-text."
+      ],
+      "expected_outcome": "A clear determination of whether the environment is text-based, aiding in subsequent interaction strategies.",
+      "tags": [
+        "environment-validation",
+        "diagnostic"
+      ],
+      "id": "SKILL-1771110645-0",
+      "source_task": "P1-T1",
+      "created_at": "2026-02-15T07:10:45.966928"
+    },
+    {
+      "name": "Classify Interactive Environment Type",
+      "description": "Analyzes text output to classify the specific type of interactive environment (e.g., MUD, Linux shell, chat system) based on clues like names, descriptions, and prompts.",
+      "trigger": "After confirming the environment is text-based or when prompted to analyze the environment subtype (e.g., as part of a task like P1-T2).",
+      "steps": [
+        "Review the server's initial or recent output for key textual elements.",
+        "Identify specific markers such as game titles, background stories, command prompts, or interaction cues.",
+        "Compare identified markers with known characteristics of environment types (e.g., MUDs feature role-playing elements and login prompts; shells have command line interfaces).",
+        "Conclude the most likely environment type based on the best match."
+      ],
+      "expected_outcome": "A classification of the environment type, such as 'MUD game', 'Linux shell', or 'chat system'.",
+      "tags": [
+        "environment identification",
+        "classification",
+        "analysis"
+      ],
+      "id": "SKILL-1771110714-1",
+      "source_task": "P1-T2",
+      "created_at": "2026-02-15T07:11:54.677765"
+    },
+    {
+      "name": "Respond to Name Prompt",
+      "description": "Input an English name in response to server prompts to initiate character registration or login.",
+      "trigger": "When server outputs a prompt requesting English name input, such as '您的英文名字：' or similar.",
+      "steps": [
+        "Identify the server prompt for English name input.",
+        "Send a generic English name (e.g., 'player' or 'test').",
+        "Observe server's response for further instructions or confirmation."
+      ],
+      "expected_outcome": "Server acknowledges the name and responds with next steps, such as confirmation prompt or additional information requests.",
+      "tags": [
+        "initialization",
+        "input_response"
+      ],
+      "id": "SKILL-1771110838-2",
+      "source_task": "P2-T1",
+      "created_at": "2026-02-15T07:13:58.885247"
+    },
+    {
+      "name": "Handle Creation Confirmation",
+      "description": "Confirm or deny the creation of a new character based on server prompt after name input.",
+      "trigger": "When server asks for confirmation to create a new character with the input name, e.g., '使用 [name] 这个名字将会创造一个新的人物，您确定吗(y/n)？'.",
+      "steps": [
+        "Read the server prompt to determine if creation is being confirmed.",
+        "If proceeding with creation, send 'y'.",
+        "If not proceeding, send 'n' or follow task-specific alternatives.",
+        "Wait for server's next output to see the effect."
+      ],
+      "expected_outcome": "Server proceeds to next step (e.g., Chinese name input) if confirmed, or returns to name input if denied.",
+      "tags": [
+        "confirmation",
+        "decision"
+      ],
+      "id": "SKILL-1771110838-3",
+      "source_task": "P2-T1",
+      "created_at": "2026-02-15T07:13:58.885247"
+    },
+    {
+      "name": "Input Registration Information",
+      "description": "Provide additional required information during character creation, such as Chinese name or password, in response to specific server prompts.",
+      "trigger": "When server prompts for specific registration information like '您的中文名字：' or '请设定您的密码：'.",
+      "steps": [
+        "Identify the type of information requested from the server prompt.",
+        "Send appropriate input based on the prompt (e.g., a Chinese name like '李逍遥', a password like 'test123').",
+        "Observe server's response to confirm acceptance and next steps."
+      ],
+      "expected_outcome": "Server accepts the input and moves to the next stage of registration or completion.",
+      "tags": [
+        "data_input",
+        "registration_flow"
+      ],
+      "id": "SKILL-1771110838-4",
+      "source_task": "P2-T1",
+      "created_at": "2026-02-15T07:13:58.885247"
+    },
+    {
+      "name": "Explore Game Help Topics",
+      "description": "Systematically navigates the help system to gather detailed information about game rules, commands, and background by exploring available topics.",
+      "trigger": "When logged into the game and needing to understand game mechanics, functionality, or background lore, or during initial environment exploration.",
+      "steps": [
+        "Input 'help' to see a list of available help topics (e.g., from output like 'cmds, rules, setup, health, story, theme').",
+        "Identify and select a topic of interest from the list.",
+        "Input 'help <topic>' (e.g., 'help health' or 'help rules') to retrieve detailed information on that topic.",
+        "If the output is paginated, use pagination navigation (send ENTER to continue, 'q' to quit, or 'b' to go back) to read all content."
+      ],
+      "expected_outcome": "Collected comprehensive help information about specific game aspects, enhancing understanding of game functions and rules.",
+      "tags": [
+        "help",
+        "exploration",
+        "information_gathering"
+      ],
+      "id": "SKILL-1771111788-5",
+      "source_task": "P2-T3",
+      "created_at": "2026-02-15T07:29:48.264836"
+    },
+    {
+      "name": "Navigate Paginated Command Outputs",
+      "description": "Handles paginated outputs from commands to ensure complete reading of information without missing content.",
+      "trigger": "When a command response includes pagination indicators such as '== 未完继续 XX% ==' with navigation options (ENTER, q, b).",
+      "steps": [
+        "Observe the command output for pagination prompts (e.g., '== 未完继续 37% == (ENTER 继续下一页，q 离开，b 前一页)').",
+        "If more information is needed, send ENTER (an empty string) to continue to the next page of output.",
+        "Optionally, send 'q' to quit pagination and return to command input, or 'b' to go back to a previous page if supported and necessary.",
+        "Repeat until all desired content is read or pagination is exited."
+      ],
+      "expected_outcome": "Access to full command output, allowing complete recording and understanding of the information provided.",
+      "tags": [
+        "pagination",
+        "output_handling",
+        "navigation"
+      ],
+      "id": "SKILL-1771111788-6",
+      "source_task": "P2-T3",
+      "created_at": "2026-02-15T07:29:48.264836"
+    },
+    {
+      "name": "Assess Character State",
+      "description": "Checks various aspects of the character's current status, including attributes, health, skills, and inventory, using specific commands.",
+      "trigger": "When evaluating the character's condition after actions, before making decisions, or during routine status checks in the game.",
+      "steps": [
+        "Use 'score' to view overall character attributes and basic health values (e.g., '精', '气', '神').",
+        "Use 'hp' to check detailed health points and status.",
+        "Use 'skills' to list learned abilities or skills.",
+        "Use 'inventory' to view items carried by the character."
+      ],
+      "expected_outcome": "A comprehensive overview of the character's current state, including health, skills, and possessions, aiding in gameplay decisions.",
+      "tags": [
+        "character_status",
+        "commands",
+        "status_check"
+      ],
+      "id": "SKILL-1771111788-7",
+      "source_task": "P2-T3",
+      "created_at": "2026-02-15T07:29:48.264836"
+    },
+    {
+      "name": "Navigate and Explore New Location",
+      "description": "Moves the character to a specified direction and collects comprehensive information about the new location for map expansion.",
+      "trigger": "When the task requires moving to a new area to explore or expand map knowledge, such as after confirming current location exits.",
+      "steps": [
+        "Use 'look' command to identify available exits and NPCs in the current location.",
+        "Execute 'go [direction]' command to move to the desired exit.",
+        "Upon arrival, use 'look' command to observe the new location's description, exits, and NPCs.",
+        "Optionally, use 'id here' command to list English names of entities in the new location.",
+        "Record the gathered information, including any dynamic events or time changes."
+      ],
+      "expected_outcome": "Character is successfully relocated to a new area with all relevant environmental details captured, enabling further exploration or task completion.",
+      "tags": [
+        "navigation",
+        "exploration"
+      ],
+      "id": "SKILL-1771112045-8",
+      "source_task": "P3-T1",
+      "created_at": "2026-02-15T07:34:05.160888"
+    },
+    {
+      "name": "Test NPC Knowledge with 'ask'",
+      "description": "Use the 'ask' command to inquire about various topics with an NPC to explore their dialogue system and gather information.",
+      "trigger": "When encountering an NPC and wanting to test communication or gather information.",
+      "steps": [
+        "1. Confirm the NPC's presence and name in the current location using 'look' or 'id here'.",
+        "2. Execute 'ask <npc_name> about <topic>' where topics are derived from environment descriptions or common themes.",
+        "3. Observe and record the NPC's response, noting patterns like refusal, lack of understanding, or no impression."
+      ],
+      "expected_outcome": "NPC responds with messages indicating their knowledge or limitations, helping assess dialogue options.",
+      "tags": [
+        "dialogue_testing"
+      ],
+      "id": "SKILL-1771112555-9",
+      "source_task": "P3-T2",
+      "created_at": "2026-02-15T07:42:35.334859"
+    },
+    {
+      "name": "Initiate Speech with 'say'",
+      "description": "Employ the 'say' command to speak to NPCs for role-playing purposes, though direct responses are not typically triggered.",
+      "trigger": "When attempting to role-play or start a conversation with an NPC.",
+      "steps": [
+        "1. Verify the NPC is present in the current location.",
+        "2. Use 'say <npc_name> <message>' to address the NPC with a message.",
+        "3. Check the output for any indirect responses or changes in the environment."
+      ],
+      "expected_outcome": "Character's speech is displayed, but no direct NPC reply is observed; useful for testing communication mechanics.",
+      "tags": [
+        "role_playing"
+      ],
+      "id": "SKILL-1771112555-10",
+      "source_task": "P3-T2",
+      "created_at": "2026-02-15T07:42:35.334859"
+    },
+    {
+      "name": "Extract Dialogue Keywords from Environment",
+      "description": "Analyze location descriptions to identify potential topics for NPC dialogue, aiding in systematic testing.",
+      "trigger": "Before or during NPC interaction to find relevant keywords for 'ask' commands.",
+      "steps": [
+        "1. Use the 'look' command to view the detailed description of the current location.",
+        "2. Identify mentioned objects (e.g., sign, door), NPCs (e.g., traveller), or themes (e.g., inn, owner).",
+        "3. Compile these as topics to test with 'ask' commands."
+      ],
+      "expected_outcome": "A list of keywords that might trigger NPC responses, improving the efficiency of dialogue exploration.",
+      "tags": [
+        "environment_analysis"
+      ],
+      "id": "SKILL-1771112555-11",
+      "source_task": "P3-T2",
+      "created_at": "2026-02-15T07:42:35.334859"
+    },
+    {
+      "name": "Adapt to Negative NPC Responses",
+      "description": "Respond to and analyze NPC rejections or lack of knowledge to adjust interaction strategies.",
+      "trigger": "When an NPC provides a negative response (e.g., refusal, not understanding) to an 'ask' command.",
+      "steps": [
+        "1. Note the specific response type (e.g., '无可奉告', '没听说过').",
+        "2. Try alternative topics based on context or move on to other NPCs or commands.",
+        "3. Consider if other conditions (e.g., items, previous events) might be required for successful interaction."
+      ],
+      "expected_outcome": "Adjusted approach for further interactions, such as switching topics or exploring other avenues, based on observed response patterns.",
+      "tags": [
+        "response_handling"
+      ],
+      "id": "SKILL-1771112555-12",
+      "source_task": "P3-T2",
+      "created_at": "2026-02-15T07:42:35.334859"
+    },
+    {
+      "name": "Equip Item for Stat Enhancement",
+      "description": "Use the 'wear' command to equip an item from inventory and verify its effects on character attributes.",
+      "trigger": "When you have an item in your inventory (e.g., cloth) and want to potentially improve character stats like defense by wearing it.",
+      "steps": [
+        "Check current inventory with the 'inventory' command to confirm the item is available.",
+        "Use the 'wear [item name]' command (e.g., 'wear cloth') to equip the item.",
+        "Verify the equipped status or any stat changes by using the 'score' command or re-checking inventory with 'inventory'."
+      ],
+      "expected_outcome": "The item is equipped, and character stats (e.g., defense) may show improvements in the 'score' output.",
+      "tags": [
+        "item management",
+        "stat improvement"
+      ],
+      "id": "SKILL-1771113271-13",
+      "source_task": "P3-T3",
+      "created_at": "2026-02-15T07:54:31.229292"
+    },
+    {
+      "name": "Test Combat with NPC",
+      "description": "Initiate combat with an NPC using the 'kill' command to observe combat mechanics and attribute impacts.",
+      "trigger": "When you want to test the combat system or engage in a fight with an available NPC (e.g., 'traveller') in the area.",
+      "steps": [
+        "Locate an NPC in the current area by using the 'look' command or observing environment descriptions.",
+        "Use the 'kill [NPC name]' command (e.g., 'kill traveller') to start combat.",
+        "Monitor system responses for combat actions, dialogue, and damage descriptions.",
+        "After combat, check character status with the 'score' command to observe changes in attributes like health or experience."
+      ],
+      "expected_outcome": "Combat is triggered, allowing observation of battle sequences and their effects on character state, including potential death.",
+      "tags": [
+        "combat",
+        "testing"
+      ],
+      "id": "SKILL-1771113271-14",
+      "source_task": "P3-T3",
+      "created_at": "2026-02-15T07:54:31.229292"
+    },
+    {
+      "name": "Navigate After Character Death",
+      "description": "After character death and respawn, navigate back to a target location to continue activities.",
+      "trigger": "Upon respawning after death, typically in a designated location like the temple, and needing to return to a familiar area such as the square.",
+      "steps": [
+        "Upon respawning, assess the current location using the 'look' command to identify exits and surroundings.",
+        "Use movement commands (e.g., 'go west') based on exit directions to travel towards the target location (e.g., the square).",
+        "Confirm arrival at the target location and check post-death status with 'score' and 'inventory' commands to evaluate recovery state."
+      ],
+      "expected_outcome": "Character is successfully moved from the respawn point to the desired area, ready for further exploration or tasks.",
+      "tags": [
+        "navigation",
+        "death recovery"
+      ],
+      "id": "SKILL-1771113271-15",
+      "source_task": "P3-T3",
+      "created_at": "2026-02-15T07:54:31.229292"
+    },
+    {
+      "name": "Pick Up Item from Environment",
+      "description": "Acquires an item from the current location by using the 'get' command and verifies it is in inventory.",
+      "trigger": "When an item is visible in the environment description (e.g., from 'look' output) and needs to be obtained for testing or use.",
+      "steps": [
+        "Identify the item name from the environment output (e.g., 'Paper seal')",
+        "Send command 'get [item name]'",
+        "Send command 'inventory' to confirm the item is in character's possession"
+      ],
+      "expected_outcome": "Item is successfully added to inventory, with a confirmation message like '你捡起一叠桃符纸' and inventory listing the item.",
+      "tags": [
+        "item_acquisition"
+      ],
+      "id": "SKILL-1771113570-16",
+      "source_task": "P4-T1",
+      "created_at": "2026-02-15T07:59:30.941963"
+    },
+    {
+      "name": "Drop Item from Inventory",
+      "description": "Removes an item from character's inventory using the 'drop' command and verifies removal.",
+      "trigger": "When an item needs to be discarded, such as after testing or to free up inventory space.",
+      "steps": [
+        "Send command 'drop [item name]' based on inventory listing",
+        "Send command 'inventory' to confirm the item is no longer present"
+      ],
+      "expected_outcome": "Item is removed from inventory, with a success message like '你丢下一叠桃符纸' and possibly additional details (e.g., value description).",
+      "tags": [
+        "item_discard"
+      ],
+      "id": "SKILL-1771113570-17",
+      "source_task": "P4-T1",
+      "created_at": "2026-02-15T07:59:30.941963"
+    },
+    {
+      "name": "Test Item Usability",
+      "description": "Attempts to use an item to check for interactive functions, handling cases where direct usage is not supported.",
+      "trigger": "When an item is in inventory and its potential usage or effects are unknown and need to be explored.",
+      "steps": [
+        "Send command 'use [item name]' (e.g., 'use paper' or 'use paper seal')",
+        "Observe server response; if it returns '什么？' or similar, note the failure",
+        "Optionally try alternative command formats or check for contextual usage in the environment if initial attempt fails"
+      ],
+      "expected_outcome": "Determines if the item can be used directly; if not, identifies it as likely non-usable or requiring specific conditions, aiding in future interaction strategies.",
+      "tags": [
+        "item_testing"
+      ],
+      "id": "SKILL-1771113570-18",
+      "source_task": "P4-T1",
+      "created_at": "2026-02-15T07:59:30.941963"
+    },
+    {
+      "name": "Respond to NPC Initiated Prompt",
+      "description": "Engage with NPCs that initiate dialogue by assessing their requests and taking appropriate actions, such as donating or acquiring items.",
+      "trigger": "When an NPC speaks unprompted in the environment, providing a message that suggests an action or request (e.g., '捐点香火钱积点阴德吧').",
+      "steps": [
+        "Listen to the NPC's dialogue message from server output.",
+        "Analyze the message for implied actions or required items (e.g., donations need coins).",
+        "Check inventory using the 'inventory' command to see if required items are available.",
+        "If items are present, attempt appropriate commands based on context (e.g., 'give coin to keeper' or alternative donation commands).",
+        "If items are missing, note the requirement and plan to explore other locations to acquire them."
+      ],
+      "expected_outcome": "Successfully interact with the NPC, potentially triggering events, state changes, or receiving further clues, or identify missing requirements for future attempts.",
+      "tags": [
+        "NPC interaction",
+        "dialogue response"
+      ],
+      "id": "SKILL-1771114465-19",
+      "source_task": "P4-T2",
+      "created_at": "2026-02-15T08:14:25.693765"
+    },
+    {
+      "name": "Test Combat Escape Mechanism",
+      "description": "Systematically checks if escape is possible during combat by querying help and attempting escape commands.",
+      "trigger": "When tasked to verify if fleeing from combat is supported in the game environment.",
+      "steps": [
+        "Use 'help flee' and 'help run' commands to check for in-game documentation on escape.",
+        "Initiate combat with an NPC using a command like 'kill npc' (e.g., 'kill traveller').",
+        "During active combat, input escape-related commands such as 'flee', 'run', and 'escape'.",
+        "Observe server responses for any indication of successful escape, such as location changes or cessation of combat messages."
+      ],
+      "expected_outcome": "Determination of whether escape mechanisms are implemented based on whether commands trigger escape or continue combat interactions.",
+      "tags": [
+        "combat",
+        "testing",
+        "escape"
+      ],
+      "id": "SKILL-1771115217-20",
+      "source_task": "P4-T3",
+      "created_at": "2026-02-15T08:26:57.212317"
+    },
+    {
+      "name": "Handle Game Session Interruption",
+      "description": "Recovers from unexpected disconnections or login loops caused by commands like 'quit' or session timeouts.",
+      "trigger": "When server output indicates a login interface, character creation prompts, or disconnection messages (e.g., '您的英文名字：', '密码错误！', '您花在连线进入手续的时间太久了').",
+      "steps": [
+        "Identify the current state by scanning output for keywords like '英文名字', '密码', or creation confirmations.",
+        "If in login, input a valid username (3-12 letters) and respond to password prompts if required.",
+        "If in character creation confirmation (e.g., '使用 [name] 这个名字将会创造一个新的人物，您确定吗(y/n)？'), respond 'n' to cancel and exit the flow.",
+        "Use commands like 'look' to confirm return to the game world or verify state after handling the interruption."
+      ],
+      "expected_outcome": "Successful re-entry into the game environment or proper exit from interruption states, allowing continuation of tasks.",
+      "tags": [
+        "session_recovery",
+        "login",
+        "interruption"
+      ],
+      "id": "SKILL-1771115217-21",
+      "source_task": "P4-T3",
+      "created_at": "2026-02-15T08:26:57.212317"
+    },
+    {
+      "name": "Complete Help Pagination Reading",
+      "description": "Reads all pages of a help command output by efficiently handling pagination prompts to capture the full text.",
+      "trigger": "When a help command response includes a pagination indicator, such as '== 未完继续 % ==' or similar prompts for continuing.",
+      "steps": [
+        "Send an empty string (simulating ENTER press) to proceed to the next page.",
+        "Wait for the server's output to update.",
+        "If the output still shows a pagination prompt, repeat step 1.",
+        "Once the pagination is complete (e.g., no more prompts or full text is displayed), aggregate and record the entire output for analysis."
+      ],
+      "expected_outcome": "The complete help text for the command is retrieved without interruption, ready for further analysis.",
+      "tags": [
+        "help_system",
+        "pagination"
+      ],
+      "id": "SKILL-1771116288-22",
+      "source_task": "P4-T4",
+      "created_at": "2026-02-15T08:44:48.385193"
+    },
+    {
+      "name": "Systematic Help Topic Exploration",
+      "description": "Executes a sequence of help commands on a predefined list of topics to gather comprehensive game system information efficiently.",
+      "trigger": "When tasked with exploring game mechanics, such as for tasks involving quests, role development, or when initial environment exploration is needed.",
+      "steps": [
+        "Define a list of relevant help topics based on the task or common mechanics (e.g., 'quest', 'task', 'experience', 'skill', 'level', 'combat', 'advance', 'system').",
+        "For each topic in the list, send the command 'help <topic>'.",
+        "Apply the 'Complete Help Pagination Reading' skill if pagination occurs during the response.",
+        "Document each response: record the help text if available, or note if no help file is returned.",
+        "After covering all topics, compile the responses for analysis to identify patterns and information about game systems."
+      ],
+      "expected_outcome": "A compiled set of help responses is collected, providing insights into available game mechanics and systems for further analysis.",
+      "tags": [
+        "exploration",
+        "help_system"
+      ],
+      "id": "SKILL-1771116288-23",
+      "source_task": "P4-T4",
+      "created_at": "2026-02-15T08:44:48.385193"
+    },
+    {
+      "name": "Test Command Recognition",
+      "description": "Verifies if a command is valid in the current environment by checking the help system after an error response.",
+      "trigger": "After receiving an error response like '什么？' or when uncertain about a command's existence or format.",
+      "steps": [
+        "1. Execute the command (e.g., 'donate').",
+        "2. If the response indicates an error or misunderstanding, use 'help [command]' to check for documentation.",
+        "3. If 'help [command]' returns '没有针对这项主题的说明文件', note that the command is likely invalid or requires a different approach."
+      ],
+      "expected_outcome": "Confirmation of command validity and identification of potential alternatives or correct usage.",
+      "tags": [
+        "command exploration"
+      ],
+      "id": "SKILL-1771117325-24",
+      "source_task": "P5-T1",
+      "created_at": "2026-02-15T09:02:05.121732"
+    },
+    {
+      "name": "Attempt Donation to Trigger Quest",
+      "description": "Tries to activate a quest by donating items to a donation box, based on environmental hints from NPCs or descriptions.",
+      "trigger": "When in a location with a donation box and NPC hints about donations (e.g., '捐点香火钱积点阴德吧'), and the 'quest' command shows no active tasks.",
+      "steps": [
+        "1. Use 'look [donation box]' to confirm it accepts donations (e.g., '你可以把想捐的钱放进去').",
+        "2. Check inventory using 'i' or similar command to identify available items.",
+        "3. If no suitable items are in inventory, examine the environment for items (e.g., using 'look' to find coins or other objects).",
+        "4. Pick up any found items using 'get [item]'.",
+        "5. Use 'put [item] in [donation box]' to attempt donation.",
+        "6. After donation, use 'quest' to check if a task has been activated."
+      ],
+      "expected_outcome": "Quest activation or feedback indicating donation success, such as a change in task status.",
+      "tags": [
+        "quest activation",
+        "donation"
+      ],
+      "id": "SKILL-1771117325-25",
+      "source_task": "P5-T1",
+      "created_at": "2026-02-15T09:02:05.121732"
+    },
+    {
+      "name": "Ensure Item Possession Before Use",
+      "description": "Checks and ensures that required items are in inventory before executing commands that depend on them, such as 'put', 'give', or 'use'.",
+      "trigger": "Before using any command that specifies an item (e.g., 'put coin in box'), to prevent inventory-related errors.",
+      "steps": [
+        "1. Execute an inventory check command, such as 'inventory' or 'i'.",
+        "2. If the required item is not listed in inventory, attempt to pick it up from the environment using 'get [item]' or explore further to locate it.",
+        "3. Once the item is confirmed to be in inventory, proceed with the intended command."
+      ],
+      "expected_outcome": "Avoidance of errors like '你身上没有这样东西' and successful execution of the command.",
+      "tags": [
+        "inventory management"
+      ],
+      "id": "SKILL-1771117325-26",
+      "source_task": "P5-T1",
+      "created_at": "2026-02-15T09:02:05.121732"
+    },
+    {
+      "name": "Examine Specific Object",
+      "description": "Obtain a detailed description of an object by using the 'look' command with its name to gather clues about its function or relevance.",
+      "trigger": "When an object is visible in the environment and you need more information about its properties or purpose.",
+      "steps": [
+        "Identify the object name from the environment description.",
+        "Use the command 'look [object name]', e.g., 'look paper seal'."
+      ],
+      "expected_outcome": "A detailed description of the object is displayed, potentially revealing insights for interaction or quest progression.",
+      "tags": [
+        "exploration",
+        "item_analysis"
+      ],
+      "id": "SKILL-1771118574-27",
+      "source_task": "P5-T1",
+      "created_at": "2026-02-15T09:22:54.698422"
+    },
+    {
+      "name": "Execute Donation to Specified Container",
+      "description": "Donate an item from inventory to a container like a donation box using the 'put' command, and observe any resulting changes or feedback.",
+      "trigger": "When you have an item in inventory and are in a location with a container that accepts donations (e.g., a donation box).",
+      "steps": [
+        "Ensure the item is in your inventory by checking with 'i' or similar commands.",
+        "Use the command 'put [item] in [container]', e.g., 'put paper seal in box'.",
+        "Monitor the server response and use 'quest' or other commands to check for updates."
+      ],
+      "expected_outcome": "The item is transferred to the container, server confirms the action, and quest status or environment may change if conditions are met.",
+      "tags": [
+        "donation",
+        "item_transfer"
+      ],
+      "id": "SKILL-1771118574-28",
+      "source_task": "P5-T1",
+      "created_at": "2026-02-15T09:22:54.698422"
+    },
+    {
+      "name": "Verify Skill Learning Environment",
+      "description": "This skill involves checking if the current location has elements that could lead to skill learning, such as NPCs or interactive objects, by using observation and interaction commands.",
+      "trigger": "When arriving at a new location while tasked with learning a skill.",
+      "steps": [
+        "Use 'look' to see the full environment description and available exits.",
+        "Look for any NPCs, objects, or clues mentioned in the description that might relate to skill learning.",
+        "Use 'skills' command to confirm the current skill status as a baseline.",
+        "If NPCs are present, attempt interaction with commands like 'ask' or try 'learn' with relevant keywords."
+      ],
+      "expected_outcome": "Determine if the location is conducive to learning a skill or if further exploration is needed.",
+      "tags": [
+        "exploration",
+        "skill check"
+      ],
+      "id": "SKILL-1771119760-29",
+      "source_task": "P5-T2",
+      "created_at": "2026-02-15T09:42:40.745615"
+    }
+  ]
+}

@@ -12,6 +12,7 @@ from connection_manager import SocketClient
 from llm_client import LLMClient
 from graph import build_graph
 from nodes import log_colored, load_kb
+from reflector import _load_experiences
 
 
 def main():
@@ -25,15 +26,24 @@ def main():
     os.makedirs(config.KB_DIR, exist_ok=True)
 
     # 确保日志目录结构存在
-    log_subdirs = ["system", "planner", "knowledge", "tasks"]
+    log_subdirs = ["system", "planner", "knowledge", "tasks", "reflector"]
     for subdir in log_subdirs:
         os.makedirs(os.path.join(config.LOG_DIR, subdir), exist_ok=True)
+        
+    # 确保反思存储目录存在
+    os.makedirs(config.REFLECTIONS_DIR, exist_ok=True)
 
     # 编译 LangGraph 图
     compiled_graph = build_graph()
     log_colored("系统", "LangGraph 状态图已编译", Colors.WHITE)
 
     # 构建初始状态（只在首次启动时使用，重连时会保留进度）
+    # 加载现有经验和技能
+    exp_data = _load_experiences()
+    initial_exp = exp_data.get("experiences", [])
+    initial_skills = exp_data.get("skills", [])
+    log_colored("系统", f"已加载 {len(initial_exp)} 条经验和 {len(initial_skills)} 个技能", Colors.WHITE)
+
     current_state = {
         "client": client,
         "llm": llm,

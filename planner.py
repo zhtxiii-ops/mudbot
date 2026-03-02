@@ -13,6 +13,7 @@ from state import AgentState
 import datetime
 
 from nodes import log_colored, get_aggregated_kb
+from reflector import reflect_on_task
 
 
 def _log(tag: str, message: str, color: str = None):
@@ -105,6 +106,31 @@ def planner(state: AgentState) -> dict:
                  _log_planner_event("TASK_GENERATED", f"[{t['id']}] {t['description']}")
 
     # ------------------------------------------------------------------
+    # 步骤0：反思之前的任务 (如果刚完成或失败)
+    # ------------------------------------------------------------------
+    if state.get("task_completed", False) or state.get("task_stuck", False):
+        last_task = state.get("current_task", {})
+        if last_task and last_task.get("id"):
+            # 获取全量知识用于反思
+            full_kb = get_aggregated_kb(phase, knowledge_base)
+            
+            # 调用反思者
+            reflections = reflect_on_task(llm, last_task, full_kb, phase)
+            
+            # 更新状态中的经验和技能
+            new_experiences = reflections.get("new_experiences", [])
+            new_skills = reflections.get("new_skills", [])
+            
+            if new_experiences:
+                state.setdefault("experiences", []).extend(new_experiences)
+            if new_skills:
+                state.setdefault("skills", []).extend(new_skills)
+                
+            # 重置 task_completed 标志 (task_stuck 会在后面处理)
+            if state.get("task_completed", False):
+                 state["task_completed"] = False
+
+    # ------------------------------------------------------------------
     # 步骤1.5：处理 stuck 任务 (优先于阶段完成检查)
     # ------------------------------------------------------------------
     if state.get("task_stuck", False):
@@ -187,7 +213,8 @@ def planner(state: AgentState) -> dict:
         if first_task:
             # 此时 knowledge_base 即将清空，但制定计划时应使用之前的全量知识作为背景
             # 这里的 full_kb_for_planning 包含了直到上一阶段的所有知识
-            plan = _create_execution_plan(llm, first_task, history, full_kb_for_planning, new_phase, new_phase_name)
+            skills = state.get("skills", [])
+            plan = _create_execution_plan(llm, first_task, history, full_kb_for_planning, new_phase, new_phase_name, skills)
             first_task["status"] = "in_progress"
             first_task["plan"] = plan
             _log("规划者", f"分配任务 [{first_task['id']}]: {first_task['description'][:60]}...", Colors.BLUE)
@@ -229,7 +256,8 @@ def planner(state: AgentState) -> dict:
     # 制定执行计划
     # 获取全量知识
     full_kb = get_aggregated_kb(phase, knowledge_base)
-    plan = _create_execution_plan(llm, next_task, history, full_kb, phase, phase_name)
+    skills = state.get("skills", [])
+    plan = _create_execution_plan(llm, next_task, history, full_kb, phase, phase_name, skills)
     next_task["status"] = "in_progress"
     next_task["plan"] = plan
 
@@ -334,31 +362,42 @@ def _determine_phase_name(llm, phase, completed_phases, knowledge_base, environm
     return result.get("phase_name", f"阶段{phase}")
 
 
-def _create_execution_plan(llm, task, history, knowledge_base, phase, phase_name):
+def _create_execution_plan(llm, task, history, knowledge_base, phase, phase_name, skills=None):
     """为具体任务制定执行计划（不依赖服务器输出，由规划者提前制定）"""
-    # 注意：根据需求，制定计划时不需要最近交互历史
-    kb_str = _format_kb(knowledge_base, limit=30)
-
-    system_prompt = f"""\
-你是一个任务规划专家。请为以下任务制定一个具体的执行计划。
+    task_id = task.get("id", "?")
+    task_desc = task.get("description", "")
+    
+    skill_str = ""
+    if skills:
+        skill_str = "可用技能:\n"
+        for s in skills:
+            skill_str += f"- {s.get('name')}: {s.get('description')} (触发条件: {s.get('trigger')})\n"
+    else:
+        skill_str = "暂无可用技能。"
+    
+    system_prompt = f"""
+你是一个 MUD 游戏智能体的规划模块。
 
 当前阶段: {phase} - {phase_name}
-任务: {task['description']}
+任务 [{task_id}]: {task_desc}
 
-知识库:
-{kb_str}
+{skill_str}
 
-请制定一个简明的执行计划，说明分析节点应该关注什么、期望什么结果、如何判断任务完成。
+当前知识库概览:
+{_format_kb(knowledge_base)}
 
-严格以 JSON 格式输出：
-{{"plan": "具体的执行计划描述..."}}
+你需要为该任务制定一个详细的执行计划。
+如果任务描述模糊，请根据知识库和阶段目标进行推断。
+如果有一致的技能，请优先在计划中引用技能。
+
+请直接输出计划内容（步骤列表或一段指导性文字），不要包含 JSON 或其他格式。
 """
     result = llm.call_with_retry(
         system_prompt, f"请为任务 {task['id']} 制定执行计划。",
-        json_mode=True, model=config.REASONER_MODEL,
+        json_mode=False, model=config.REASONER_MODEL,
         caller_id=f"Planner-Plan[Task{task.get('id', '?')}]"
     )
-    return result.get("plan", "观察服务器输出并做出适当响应。")
+    return result
 
 
 def _extract_key_findings(tasks):

@@ -3,6 +3,10 @@ import os
 import sys
 import time
 import requests
+
+# Add parent directory to sys.path to import config and llm_client
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 import config
 from llm_client import LLMClient
 

@@ -48,3 +48,7 @@ class AgentState(TypedDict, total=False):
     # --- 知识库管理 ---
     kb_consolidation_counter: int  # 知识库整理计数器
     kb_update_future: Any          # 后台知识管理线程的 Future 对象
+
+    # --- 反思与经验 ---
+    experiences: list[dict]        # 反思后积累的经验列表
+    skills: list[dict]             # 反思后积累的技能列表

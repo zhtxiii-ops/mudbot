@@ -27,8 +27,12 @@ LOG_FILE = os.path.join(LOG_DIR, "system", "interaction.log")
 PLANNER_LOG_FILE = os.path.join(LOG_DIR, "planner", "history.log")
 KNOWLEDGE_LOG_FILE = os.path.join(LOG_DIR, "knowledge", "manager.log")
 TASK_LOG_DIR = os.path.join(LOG_DIR, "tasks")
-KB_FILE = os.path.join(_SCRIPT_DIR, "knowledge_base.json")  # 保留兼容
-KB_DIR = os.path.join(_SCRIPT_DIR, "knowledge_bases")  # 阶段化知识库目录
+REFLECTOR_LOG_FILE = os.path.join(LOG_DIR, "reflector", "reflections.log")
+DATA_DIR = os.path.join(_SCRIPT_DIR, "data")
+REFLECTIONS_DIR = os.path.join(DATA_DIR, "reflections")
+EXPERIENCES_FILE = os.path.join(REFLECTIONS_DIR, "experiences.json")
+KB_FILE = os.path.join(DATA_DIR, "knowledge_base.json")  # 保留兼容
+KB_DIR = os.path.join(DATA_DIR, "knowledge_bases")  # 阶段化知识库目录
 KB_CONSOLIDATION_INTERVAL = 20  # 每隔 N 轮整理一次知识库
 MAX_TASK_ATTEMPTS = 50           # 单个任务最大尝试轮数，超过则判定为僵局
 
